@@ -16,40 +16,40 @@ class MyApp extends StatelessWidget {
         body: Center(
           child: SingleChildScrollView(
             child: CommonForm(
-              onFormValid: (valid) {
-                if (valid) {
+              onFormValid: (formValid) {
+                if (formValid) {
                   print("form valid");
                 } else {
                   print("form invalid");
                 }
               },
-              listFieldBuilder: (context, checkValid) {
+              listFieldBuilder: (context, checkFormValid) {
                 return [
                   CommonField(
                     isRequired: true,
-                    builder: (context, setValid) {
+                    builder: (context, setFieldValid) {
                       return TextFormField(
                         onChanged: (value) {
-                          setValid.call(value.isNotEmpty);
+                          setFieldValid.call(value.isNotEmpty);
                         },
                       );
                     },
                     onFieldValid: (isFieldValid) {
-                      checkValid(isFieldValid);
+                      checkFormValid(isFieldValid);
                     },
                     title: 'Email',
                   ),
                   CommonField(
                     isRequired: true,
-                    builder: (context, setValid) {
+                    builder: (context, setFieldValid) {
                       return TextFormField(
                         onChanged: (value) {
-                          setValid.call(value.isNotEmpty);
+                          setFieldValid.call(value.isNotEmpty);
                         },
                       );
                     },
                     onFieldValid: (isFieldValid) {
-                      // checkValid(isFieldValid);
+                      // checkFormValid(isFieldValid);
                     },
                     title: 'Password',
                   )

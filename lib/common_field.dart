@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+///
+///
+/// [init] : when field created at first time
+/// [invalid] : when value of field is incorrect
+/// [invalid] : when value of field is correct
+///
 enum FieldStatus { init, invalid, valid }
 
 class CommonField extends StatefulWidget {
@@ -8,23 +14,40 @@ class CommonField extends StatefulWidget {
       required this.isRequired,
       required this.builder,
       required this.onFieldValid,
-      required this.title});
+      required this.title,
+      this.fieldStatus = FieldStatus.init});
 
   final bool isRequired;
+
+  final FieldStatus fieldStatus;
   final String title;
+
+  ///
+  /// [setValid] call when [builder] (textField,ComboBox, DropDown Button) is Valid
   final Widget Function(BuildContext context, Function(bool) setValid) builder;
+
+  ///
+  /// return true when field is valid
   final Function(bool) onFieldValid;
 
-  bool isFieldRequired(){
+  bool isFieldRequired() {
     return isRequired;
   }
+
   @override
   State<CommonField> createState() => _CommonFieldState();
 }
 
 class _CommonFieldState extends State<CommonField> {
-  bool isValid = false;
-  FieldStatus status = FieldStatus.init;
+  bool _isFieldValid = false;
+
+  late FieldStatus _status;
+
+  @override
+  void initState() {
+    super.initState();
+    _status = widget.fieldStatus;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,22 +61,26 @@ class _CommonFieldState extends State<CommonField> {
             TextSpan(text: widget.title),
             TextSpan(
                 text: widget.isRequired ? "*" : '',
-                style: TextStyle(color: Colors.red))
+                style: const TextStyle(color: Colors.red))
           ]),
         ),
         Container(
           decoration: BoxDecoration(
-            border: status == FieldStatus.invalid
+            border: _status == FieldStatus.invalid
                 ? Border.all(color: Colors.red)
                 : null,
           ),
-          child: widget.builder(context, (valid) {
-            if (isValid != valid) {
-              isValid = valid;
+          child: widget.builder(context, (childSetValid) {
+            // _isFieldValid != childSetValid prevent call multi times
+            if (_isFieldValid != childSetValid) {
+              _isFieldValid = childSetValid;
               setState(() {
-                widget.onFieldValid(isValid);
+                // set field valid/invalid
+                widget.onFieldValid(_isFieldValid);
+                // update status
+                _status =
+                    _isFieldValid ? FieldStatus.valid : FieldStatus.invalid;
               });
-              status = isValid ? FieldStatus.valid : FieldStatus.invalid;
             }
           }),
         )
